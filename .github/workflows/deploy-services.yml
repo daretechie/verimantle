@@ -1,0 +1,133 @@
+name: Deploy Rust Services
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/gate/**'
+      - 'packages/synapse/**'
+      - 'packages/arbiter/**'
+      - '.github/workflows/deploy-services.yml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  # ============================================
+  # Build and Push Docker Images
+  # ============================================
+  build-gate:
+    name: Build Gate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: packages/gate
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/gate:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/gate:${{ github.sha }}
+
+  build-synapse:
+    name: Build Synapse
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: packages/synapse
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/synapse:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/synapse:${{ github.sha }}
+
+  build-arbiter:
+    name: Build Arbiter
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: packages/arbiter
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/arbiter:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/arbiter:${{ github.sha }}
+
+  # ============================================
+  # Deploy to Fly.io (Optional)
+  # ============================================
+  deploy-fly:
+    name: Deploy to Fly.io
+    needs: [build-gate, build-synapse, build-arbiter]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      
+      - name: Deploy Gate
+        if: ${{ secrets.FLY_API_TOKEN != '' }}
+        working-directory: packages/gate
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      
+      - name: Deploy Synapse
+        if: ${{ secrets.FLY_API_TOKEN != '' }}
+        working-directory: packages/synapse
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      
+      - name: Deploy Arbiter
+        if: ${{ secrets.FLY_API_TOKEN != '' }}
+        working-directory: packages/arbiter
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

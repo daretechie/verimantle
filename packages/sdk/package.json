@@ -5,11 +5,16 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
+  "homepage": "https://github.com/daretechie/verimantle#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "ai",
@@ -18,12 +23,18 @@
     "identity",
     "guardrails",
     "orchestration",
-    "verimantle"
+    "verimantle",
+    "llm",
+    "autonomous"
   ],
   "author": "VeriMantle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/daretechie/verimantle.git"
+    "url": "https://github.com/daretechie/verimantle.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/daretechie/verimantle/issues"
   },
   "files": [
     "dist",
@@ -35,5 +46,8 @@
     "typescript": "^5.3.0",
     "vitest": "^1.0.0"
   },
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "engines": {
+    "node": ">=18"
+  }
 }

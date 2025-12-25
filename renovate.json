@@ -1,0 +1,14 @@
+version: 1
+update_configs:
+  - package_manager: "javascript"
+    directory: "/packages/sdk"
+    update_schedule: "weekly"
+  - package_manager: "rust:cargo"
+    directory: "/packages/gate"
+    update_schedule: "weekly"
+  - package_manager: "rust:cargo"
+    directory: "/packages/synapse"
+    update_schedule: "weekly"
+  - package_manager: "rust:cargo"
+    directory: "/packages/arbiter"
+    update_schedule: "weekly"
