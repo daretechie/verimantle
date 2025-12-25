@@ -159,6 +159,208 @@ impl MeshCoordinator {
     pub fn cells_in_region(&self, region: &str) -> Vec<&MeshCell> {
         self.cells.iter().filter(|c| c.region == region).collect()
     }
+
+    /// Get healthy cell count.
+    pub fn healthy_cell_count(&self) -> usize {
+        self.cells.iter().filter(|c| c.status == CellStatus::Healthy).count()
+    }
+}
+
+// ============================================
+// Autonomic Mitosis (Auto-Scaling)
+// ============================================
+
+/// Scaling policy for auto-scaling.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ScalingPolicy {
+    /// Minimum cells
+    pub min_cells: u32,
+    /// Maximum cells
+    pub max_cells: u32,
+    /// Target CPU utilization (0-100)
+    pub target_cpu: u8,
+    /// Target memory utilization (0-100)
+    pub target_memory: u8,
+    /// Target requests per second per cell
+    pub target_rps_per_cell: u32,
+    /// Cooldown period in seconds
+    pub cooldown_secs: u32,
+    /// Scale up threshold (percentage above target)
+    pub scale_up_threshold: u8,
+    /// Scale down threshold (percentage below target)
+    pub scale_down_threshold: u8,
+}
+
+impl Default for ScalingPolicy {
+    fn default() -> Self {
+        Self {
+            min_cells: 2,
+            max_cells: 100,
+            target_cpu: 70,
+            target_memory: 80,
+            target_rps_per_cell: 1000,
+            cooldown_secs: 300,
+            scale_up_threshold: 20,
+            scale_down_threshold: 30,
+        }
+    }
+}
+
+/// Scaling decision.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ScalingDecision {
+    /// Scale up by N cells
+    ScaleUp(u32),
+    /// Scale down by N cells
+    ScaleDown(u32),
+    /// No action needed
+    NoAction,
+    /// In cooldown period
+    Cooldown,
+}
+
+/// Current mesh metrics.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MeshMetrics {
+    /// Total cells
+    pub total_cells: u32,
+    /// Healthy cells
+    pub healthy_cells: u32,
+    /// Average CPU utilization
+    pub avg_cpu: u8,
+    /// Average memory utilization
+    pub avg_memory: u8,
+    /// Total requests per second
+    pub total_rps: u32,
+    /// Timestamp
+    pub timestamp: u64,
+}
+
+/// Mitosis event (scale action).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MitosisEvent {
+    /// Event ID
+    pub id: String,
+    /// Timestamp
+    pub timestamp: u64,
+    /// Decision made
+    pub decision: ScalingDecision,
+    /// Metrics at decision time
+    pub metrics: MeshMetrics,
+    /// Region affected
+    pub region: String,
+    /// Cells spawned/terminated
+    pub cell_ids: Vec<String>,
+}
+
+/// Autonomic Mitosis controller for auto-scaling.
+pub struct MitosisController {
+    policy: ScalingPolicy,
+    last_scale_time: u64,
+    events: Vec<MitosisEvent>,
+}
+
+impl MitosisController {
+    /// Create a new mitosis controller (requires enterprise license).
+    pub fn new(policy: ScalingPolicy) -> Result<Self, LicenseError> {
+        require_license("AUTONOMIC_MITOSIS")?;
+        
+        Ok(Self {
+            policy,
+            last_scale_time: 0,
+            events: vec![],
+        })
+    }
+
+    /// Evaluate current metrics and decide on scaling.
+    pub fn evaluate(&mut self, metrics: &MeshMetrics) -> ScalingDecision {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        // Check cooldown
+        if now - self.last_scale_time < self.policy.cooldown_secs as u64 {
+            return ScalingDecision::Cooldown;
+        }
+
+        // Calculate current RPS per cell
+        let rps_per_cell = if metrics.healthy_cells > 0 {
+            metrics.total_rps / metrics.healthy_cells
+        } else {
+            u32::MAX // Need to scale up immediately
+        };
+
+        // Check if we need to scale up
+        let cpu_overload = metrics.avg_cpu > self.policy.target_cpu + self.policy.scale_up_threshold;
+        let memory_overload = metrics.avg_memory > self.policy.target_memory + self.policy.scale_up_threshold;
+        let rps_overload = rps_per_cell > self.policy.target_rps_per_cell;
+
+        if (cpu_overload || memory_overload || rps_overload) && 
+           metrics.total_cells < self.policy.max_cells {
+            // Calculate how many cells to add
+            let cells_needed = if rps_overload {
+                let total_needed = (metrics.total_rps / self.policy.target_rps_per_cell).max(1);
+                total_needed.saturating_sub(metrics.healthy_cells)
+            } else {
+                // Add 25% more capacity
+                (metrics.healthy_cells / 4).max(1)
+            };
+            
+            let cells_to_add = cells_needed.min(self.policy.max_cells - metrics.total_cells);
+            
+            if cells_to_add > 0 {
+                self.last_scale_time = now;
+                return ScalingDecision::ScaleUp(cells_to_add);
+            }
+        }
+
+        // Check if we can scale down
+        let cpu_underload = metrics.avg_cpu < self.policy.target_cpu.saturating_sub(self.policy.scale_down_threshold);
+        let memory_underload = metrics.avg_memory < self.policy.target_memory.saturating_sub(self.policy.scale_down_threshold);
+        let rps_underload = rps_per_cell < self.policy.target_rps_per_cell / 2;
+
+        if cpu_underload && memory_underload && rps_underload && 
+           metrics.total_cells > self.policy.min_cells {
+            // Remove 25% of cells
+            let cells_to_remove = (metrics.healthy_cells / 4)
+                .max(1)
+                .min(metrics.total_cells - self.policy.min_cells);
+            
+            if cells_to_remove > 0 {
+                self.last_scale_time = now;
+                return ScalingDecision::ScaleDown(cells_to_remove);
+            }
+        }
+
+        ScalingDecision::NoAction
+    }
+
+    /// Record a mitosis event.
+    pub fn record_event(&mut self, event: MitosisEvent) {
+        tracing::info!(
+            decision = ?event.decision,
+            region = %event.region,
+            cells = ?event.cell_ids,
+            "Mitosis event recorded"
+        );
+        self.events.push(event);
+    }
+
+    /// Get event history.
+    pub fn events(&self) -> &[MitosisEvent] {
+        &self.events
+    }
+
+    /// Get current policy.
+    pub fn policy(&self) -> &ScalingPolicy {
+        &self.policy
+    }
+
+    /// Update policy.
+    pub fn set_policy(&mut self, policy: ScalingPolicy) {
+        self.policy = policy;
+    }
 }
 
 #[cfg(test)]
@@ -179,4 +381,57 @@ mod tests {
         assert!(result.is_ok());
         std::env::remove_var("VERIMANTLE_LICENSE_KEY");
     }
+
+    #[test]
+    fn test_mitosis_scale_up() {
+        std::env::set_var("VERIMANTLE_LICENSE_KEY", "test-license");
+        
+        let mut controller = MitosisController::new(ScalingPolicy::default()).unwrap();
+        
+        // High load metrics
+        let metrics = MeshMetrics {
+            total_cells: 5,
+            healthy_cells: 5,
+            avg_cpu: 95, // Overloaded
+            avg_memory: 85,
+            total_rps: 10000,
+            timestamp: 0,
+        };
+        
+        let decision = controller.evaluate(&metrics);
+        assert!(matches!(decision, ScalingDecision::ScaleUp(_)));
+        
+        std::env::remove_var("VERIMANTLE_LICENSE_KEY");
+    }
+
+    #[test]
+    fn test_mitosis_scale_down() {
+        std::env::set_var("VERIMANTLE_LICENSE_KEY", "test-license");
+        
+        let mut controller = MitosisController::new(ScalingPolicy::default()).unwrap();
+        
+        // Low load metrics
+        let metrics = MeshMetrics {
+            total_cells: 10,
+            healthy_cells: 10,
+            avg_cpu: 20, // Underloaded
+            avg_memory: 30,
+            total_rps: 1000,
+            timestamp: 0,
+        };
+        
+        let decision = controller.evaluate(&metrics);
+        assert!(matches!(decision, ScalingDecision::ScaleDown(_)));
+        
+        std::env::remove_var("VERIMANTLE_LICENSE_KEY");
+    }
+
+    #[test]
+    fn test_scaling_policy_defaults() {
+        let policy = ScalingPolicy::default();
+        assert_eq!(policy.min_cells, 2);
+        assert_eq!(policy.max_cells, 100);
+        assert_eq!(policy.target_cpu, 70);
+    }
 }
+
