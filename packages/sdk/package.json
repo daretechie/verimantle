@@ -1,15 +1,39 @@
 {
   "name": "@verimantle/sdk",
   "version": "0.1.0",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "description": "The Unified SDK for VeriMantle - The Operating System for the Agentic Economy",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint src/",
-    "dev": "tsc -w"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts"
   },
+  "keywords": [
+    "ai",
+    "agents",
+    "agentic",
+    "identity",
+    "guardrails",
+    "orchestration",
+    "verimantle"
+  ],
+  "author": "VeriMantle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daretechie/verimantle.git"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {},
   "devDependencies": {
-    "typescript": "latest",
-    "eslint": "latest"
-  }
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  },
+  "peerDependencies": {}
 }
