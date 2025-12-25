@@ -11,6 +11,8 @@
 //! - `sovereign`: Data sovereignty and geo-fencing
 //! - `crypto`: Quantum-safe cryptography
 //! - `mtls`: Zero-trust mTLS
+//! - `hipaa`: HIPAA healthcare compliance
+//! - `pci`: PCI-DSS payment compliance
 
 pub mod policy;
 pub mod dsl;
@@ -34,6 +36,8 @@ pub mod budget;            // Gas Limits & Budgets (Section 6)
 pub mod crypto_agility;    // Quantum-Safe Crypto (Section 3)
 pub mod takaful;           // Takaful Compliance (Section 2)
 pub mod mtls;              // Zero-Trust mTLS (Section 5)
+pub mod hipaa;             // HIPAA Healthcare Compliance (Section 2)
+pub mod pci;               // PCI-DSS Payment Compliance (Section 2)
 
 #[cfg(feature = "wasm")]
 pub mod wasm;              // WASM Component Model
@@ -51,5 +55,8 @@ pub use budget::{AgentBudget, BudgetConfig, BudgetError};
 pub use crypto_agility::{CryptoProvider, CryptoMode, Algorithm};
 pub use takaful::{TakafulValidator, TakafulError, ComplianceResult};
 pub use mtls::{CertificateValidator, MtlsConfig, CertificateInfo};
+pub use hipaa::{HipaaValidator, HipaaError, PhiScanResult, HipaaRole};
+pub use pci::{PciValidator, PciError, CardToken, CardBrand};
+
 
 
