@@ -1,11 +1,11 @@
 //! VeriMantle-Arbiter: Conflict Resolution & Coordination Engine
 //!
-//! The "Traffic Control" for autonomous AI agents.
+//! Per ARCHITECTURE.md: "The Core (Rust/Hyper-Loop)"
 //!
-//! Per ARCHITECTURE.md:
-//! - Implements Atomic Business Locks
-//! - Uses Raft for distributed consensus
-//! - Priority-based conflict resolution
+//! Features implemented:
+//! - **Thread-per-Core**: Minimal context switching for sub-ms latency
+//! - **Raft Consensus**: Strong consistency for Atomic Business Locks
+//! - **Priority Preemption**: Higher priority agents can preempt locks
 //!
 //! # Architecture
 //!
@@ -13,14 +13,18 @@
 //! ┌─────────────────────────────────────────────────────────────┐
 //! │                    VeriMantle-Arbiter                       │
 //! ├─────────────────────────────────────────────────────────────┤
+//! │         Thread-per-Core Runtime (Hyper-Loop)                │
 //! │  ┌─────────┐    ┌─────────┐    ┌─────────┐                 │
-//! │  │ Request │───►│ Lock    │───►│ Queue   │                 │
-//! │  │ Handler │    │ Manager │    │ Manager │                 │
-//! │  └─────────┘    └─────────┘    └─────────┘                 │
-//! │                      │              │                       │
-//! │                      ▼              ▼                       │
-//! │                 Priority        Fairness                    │
-//! │                 Scheduler       Enforcer                    │
+//! │  │ Core 0  │    │ Core 1  │    │ Core N  │                 │
+//! │  │         │    │         │    │         │                 │
+//! │  └────┬────┘    └────┬────┘    └────┬────┘                 │
+//! │       │              │              │                       │
+//! │       └──────────────┼──────────────┘                       │
+//! │                      ▼                                      │
+//! │           ┌─────────────────────┐                          │
+//! │           │ Raft Lock Manager   │                          │
+//! │           │ (Strong Consistency)│                          │
+//! │           └─────────────────────┘                          │
 //! └─────────────────────────────────────────────────────────────┘
 //! ```
 
@@ -29,8 +33,14 @@ pub mod queue;
 pub mod coordinator;
 pub mod types;
 
+// Hyper-Stack modules (per ARCHITECTURE.md)
+pub mod raft;              // Raft Consensus for Atomic Business Locks
+pub mod thread_per_core;   // Thread-per-Core for minimal latency
+
 // Re-exports
 pub use locks::LockManager;
 pub use queue::PriorityQueue;
 pub use coordinator::Coordinator;
-pub use types::{BusinessLock, CoordinationRequest, CoordinationResult};
+pub use types::{BusinessLock, CoordinationRequest, CoordinationResult, LockType};
+pub use raft::{RaftLockManager, RaftConfig, RaftState};
+pub use thread_per_core::{ThreadPerCoreRuntime, ThreadPerCoreConfig};

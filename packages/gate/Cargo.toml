@@ -13,20 +13,30 @@ path = "src/lib.rs"
 name = "gate-server"
 path = "src/bin/server.rs"
 
+[features]
+default = []
+# Hyper-Stack Features (per ARCHITECTURE.md)
+io_uring = ["tokio-uring"]      # Zero-copy I/O
+wasm = ["wasmtime"]             # WASM policy isolation
+neural = ["ort"]                # ONNX neural inference
+full = ["io_uring", "wasm", "neural"]
+
 [dependencies]
 # Async runtime (per ARCHITECTURE: io_uring optimized)
 tokio = { version = "1", features = ["full"] }
+# io_uring for Linux (zero-copy async I/O) - optional
+tokio-uring = { version = "0.5", optional = true }
 
 # Serialization
 serde = { version = "1", features = ["derive"] }
 serde_yaml = "0.9"
 serde_json = "1"
 
-# ONNX Runtime for Neural path (per ENGINEERING_STANDARD: Neuro-Symbolic)
-# ort = "1.16"  # Uncomment when ML models are integrated
+# WASM Component Model for policy isolation (per ARCHITECTURE: Nano-Isolation)
+wasmtime = { version = "27", optional = true }
 
-# Policy engine for symbolic path
-# polar-core = "0.26"  # Uncomment when Oso/Polar is integrated
+# ONNX Runtime for Neural path (per ENGINEERING_STANDARD: Neuro-Symbolic)
+ort = { version = "2.0.0-rc.10", optional = true }
 
 # HTTP server
 axum = "0.7"
@@ -47,6 +57,15 @@ uuid = { version = "1", features = ["v4", "serde"] }
 # Time handling
 chrono = { version = "0.4", features = ["serde"] }
 
+# Concurrent data structures (for observability)
+parking_lot = "0.12"
+
 [dev-dependencies]
 tokio-test = "0.4"
-# criterion = "0.5"  # Uncomment when adding benchmarks
+criterion = "0.5"
+
+[[bench]]
+name = "policy_eval"
+harness = false
+
+
