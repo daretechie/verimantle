@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # ===========================================
+  # VeriMantle Gate - Verification Engine
+  # ===========================================
+  gate:
+    build:
+      context: ./packages/gate
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - RUST_LOG=info
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ===========================================
+  # VeriMantle Synapse - State & Intent
+  # ===========================================
+  synapse:
+    build:
+      context: ./packages/synapse
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - RUST_LOG=info
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ===========================================
+  # VeriMantle Arbiter - Coordination
+  # ===========================================
+  arbiter:
+    build:
+      context: ./packages/arbiter
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - RUST_LOG=info
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ===========================================
+  # VeriMantle Gateway (Optional - NestJS)
+  # ===========================================
+  # gateway:
+  #   build:
+  #     context: ./apps/gateway
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - PORT=3000
+  #     - GATE_URL=http://gate:3001
+  #     - SYNAPSE_URL=http://synapse:3002
+  #     - ARBITER_URL=http://arbiter:3003
+  #   depends_on:
+  #     - gate
+  #     - synapse
+  #     - arbiter
+
+networks:
+  default:
+    name: verimantle-network
