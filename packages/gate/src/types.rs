@@ -64,26 +64,75 @@ pub struct LatencyBreakdown {
 }
 
 /// Data residency region for sovereignty compliance.
-/// Per GLOBAL_GAPS.md and ENGINEERING_STANDARD.md
+/// 
+/// Per December 2025 research on AWS/Azure regional strategies:
+/// - Tier 1: Major regulatory blocs with strict localization
+/// - Tier 2: Emerging sovereignty blocs with specific laws
+/// - Tier 3: Regional fallbacks for broader compliance
+/// 
+/// Reference: GLOBAL_GAPS.md, ENGINEERING_STANDARD.md
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DataRegion {
-    /// United States (HIPAA, Sales Tax)
+    // ═══════════════════════════════════════════════════════════════
+    // Tier 1: Major Regulatory Blocs (strict localization required)
+    // ═══════════════════════════════════════════════════════════════
+    
+    /// United States (HIPAA, CCPA, SOX, Sales Tax)
     Us,
-    /// European Union (GDPR, VAT)
+    /// European Union (GDPR, EU Data Act 2025, VAT)
     Eu,
-    /// China (PIPL - Personal Information Protection Law)
+    /// China (PIPL - requires in-country processing)
     Cn,
-    /// Middle East & North Africa (Islamic Finance/Takaful, Vision 2030)
+    
+    // ═══════════════════════════════════════════════════════════════
+    // Tier 2: Emerging Sovereignty Blocs (country-specific laws)
+    // ═══════════════════════════════════════════════════════════════
+    
+    /// Middle East & North Africa (GCC Vision 2030, Saudi PDPL, Islamic Finance/Takaful)
     Mena,
-    /// Asia-Pacific (Regional codes, DPDP India, Singapore PDPA)
-    Asia,
-    /// Africa (National sovereignty, data localization)
+    /// India (DPDP Act 2023 - strict consent, purpose limitation)
+    India,
+    /// Brazil (LGPD - similar to GDPR)
+    Brazil,
+    
+    // ═══════════════════════════════════════════════════════════════
+    // Tier 3: Regional Fallbacks (less strict, grouped compliance)
+    // ═══════════════════════════════════════════════════════════════
+    
+    /// Asia-Pacific (Singapore PDPA, Japan APPI, Korea PIPA, Australia Privacy Act)
+    AsiaPac,
+    /// Africa (varying data localization by country)
     Africa,
-    /// Oceania (Australian Privacy Act, NZ Privacy Act)
-    Oceania,
+    
+    // ═══════════════════════════════════════════════════════════════
+    // Default
+    // ═══════════════════════════════════════════════════════════════
+    
     /// Global (no specific residency, universal policies)
     Global,
+}
+
+impl DataRegion {
+    /// Returns true if this region requires strict data localization.
+    pub fn requires_localization(&self) -> bool {
+        matches!(self, Self::Cn | Self::Eu | Self::India | Self::Mena)
+    }
+    
+    /// Returns the privacy law name for this region.
+    pub fn privacy_law(&self) -> &'static str {
+        match self {
+            Self::Us => "HIPAA/CCPA",
+            Self::Eu => "GDPR",
+            Self::Cn => "PIPL",
+            Self::Mena => "Saudi PDPL/GCC",
+            Self::India => "DPDP Act 2023",
+            Self::Brazil => "LGPD",
+            Self::AsiaPac => "PDPA/APPI/PIPA",
+            Self::Africa => "Various",
+            Self::Global => "None",
+        }
+    }
 }
 
 impl Default for DataRegion {
@@ -91,4 +140,5 @@ impl Default for DataRegion {
         Self::Global
     }
 }
+
 
