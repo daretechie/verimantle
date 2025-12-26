@@ -71,7 +71,10 @@ pub use thread_per_core::{ThreadPerCoreRuntime, ThreadPerCoreConfig};
 pub use audit::{AuditLedger, AuditRecord, AuditOutcome, AuditStatistics};
 pub use killswitch::{KillSwitch, KillReason, KillRecord, TerminationType};
 pub use carbon::{CarbonScheduler, CarbonIntensity, CarbonRegion};
-pub use antifragile::{AntifragileEngine, Failure, FailureClass, RecoveryStrategy, CircuitBreaker, CircuitState};
+pub use antifragile::{
+    AntifragileEngine, Failure, FailureClass, RecoveryStrategy, CircuitBreaker, CircuitState,
+    FailureSeverity, FailureCategory, AdaptationRate, RecoveryStrategyType,
+};
 pub use chaos::{ChaosMonkey, ChaosConfig, ChaosError, ChaosResult, ChaosStats};
 pub use loop_prevention::{LoopPreventer, LoopPreventionConfig, TrackedMessage, LoopPreventionError};
 

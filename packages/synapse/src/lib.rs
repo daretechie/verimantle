@@ -57,13 +57,10 @@ pub use adaptive::{AdaptiveExecutor, ExecutionStrategy, ExecutionMetrics};
 pub use embeddings::{EmbeddingConfig, EmbeddingProvider, PolyglotEmbedder, SynapseRegion};
 pub use crdt::{GCounter, PNCounter, LwwRegister, OrSet, LwwMap, AgentStateCrdt};
 
-// Innovation #4: Anti-Fragile Self-Healing Engine
-pub mod antifragile;
-pub use antifragile::{
-    AntifragileEngine, AntifragileStats, FailureEvent, FailureCategory,
-    FailureSeverity, RecoveryStrategy, CircuitBreaker, CircuitState, AdaptationRate
-};
+// NOTE: Antifragile moved to verimantle-arbiter during consolidation
+// See: packages/arbiter/src/antifragile.rs
 
 // Innovation #10: Digital Twin Sandbox
 pub mod sandbox;
 pub use sandbox::{SandboxEngine, Sandbox, SandboxMode, EnvironmentSnapshot, ChaosEvent, TestScenario, TestResult};
+

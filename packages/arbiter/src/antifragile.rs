@@ -21,7 +21,147 @@ use tokio::sync::RwLock;
 use chrono::{DateTime, Utc, Duration};
 use serde::{Deserialize, Serialize};
 
-/// Failure classification.
+// ============================================================================
+// SEVERITY & CATEGORY (merged from synapse/antifragile.rs)
+// ============================================================================
+
+/// Failure severity levels - how serious is this failure?
+/// Merged from synapse for "growing stronger through failure" pattern.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub enum FailureSeverity {
+    /// Minor issue, auto-recoverable
+    Minor,
+    /// Moderate issue, needs intervention
+    Moderate,
+    /// Major issue, significant impact
+    Major,
+    /// Critical issue, system-wide impact
+    Critical,
+}
+
+/// Failure category for pattern matching - more granular than FailureClass.
+/// Merged from synapse for intelligent recovery strategy selection.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum FailureCategory {
+    /// Network-related failures
+    Network,
+    /// Timeout failures
+    Timeout,
+    /// Resource exhaustion (memory, CPU)
+    ResourceExhaustion,
+    /// External API failures
+    ExternalApi,
+    /// Data corruption
+    DataCorruption,
+    /// Policy violation
+    PolicyViolation,
+    /// Rate limiting
+    RateLimit,
+    /// Authentication failure
+    AuthFailure,
+    /// Unknown/other
+    Other(String),
+}
+
+impl FailureCategory {
+    /// Get recommended recovery strategy based on category and attempt count.
+    /// This is the "growing stronger" logic - learns from repeated failures.
+    pub fn recommend_strategy(&self, attempt: u32) -> RecoveryStrategyType {
+        match (self, attempt) {
+            (FailureCategory::Network, 0..=2) => RecoveryStrategyType::Retry,
+            (FailureCategory::Network, 3..=5) => RecoveryStrategyType::ExponentialBackoff,
+            (FailureCategory::Network, _) => RecoveryStrategyType::CircuitBreaker,
+            
+            (FailureCategory::Timeout, 0..=1) => RecoveryStrategyType::Retry,
+            (FailureCategory::Timeout, _) => RecoveryStrategyType::CircuitBreaker,
+            
+            (FailureCategory::RateLimit, _) => RecoveryStrategyType::ExponentialBackoff,
+            
+            (FailureCategory::ExternalApi, 0..=2) => RecoveryStrategyType::Fallback,
+            (FailureCategory::ExternalApi, _) => RecoveryStrategyType::GracefulDegradation,
+            
+            (FailureCategory::ResourceExhaustion, _) => RecoveryStrategyType::GracefulDegradation,
+            
+            (FailureCategory::DataCorruption, _) => RecoveryStrategyType::Rollback,
+            
+            (FailureCategory::PolicyViolation, _) => RecoveryStrategyType::Skip,
+            
+            (FailureCategory::AuthFailure, 0..=1) => RecoveryStrategyType::Retry,
+            (FailureCategory::AuthFailure, _) => RecoveryStrategyType::HumanIntervention,
+            
+            (FailureCategory::Other(_), 0..=2) => RecoveryStrategyType::Retry,
+            (FailureCategory::Other(_), _) => RecoveryStrategyType::HumanIntervention,
+        }
+    }
+}
+
+/// Recovery strategy types for automatic selection.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum RecoveryStrategyType {
+    Retry,
+    ExponentialBackoff,
+    Fallback,
+    CircuitBreaker,
+    GracefulDegradation,
+    HumanIntervention,
+    Rollback,
+    Skip,
+}
+
+// ============================================================================
+// ADAPTATION RATE (merged from synapse/antifragile.rs)
+// ============================================================================
+
+/// Learning rate for adaptation - implements "growing stronger through failure".
+/// Systems boost their response rate after failures, decay after successes.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AdaptationRate {
+    /// Base learning rate
+    pub base_rate: f64,
+    /// Current multiplier
+    pub multiplier: f64,
+    /// Maximum multiplier
+    pub max_multiplier: f64,
+    /// Decay factor per success
+    pub decay: f64,
+    /// Boost factor per failure
+    pub boost_factor: f64,
+}
+
+impl Default for AdaptationRate {
+    fn default() -> Self {
+        Self {
+            base_rate: 1.0,
+            multiplier: 1.0,
+            max_multiplier: 10.0,
+            decay: 0.9,
+            boost_factor: 1.5,
+        }
+    }
+}
+
+impl AdaptationRate {
+    /// Get current effective rate.
+    pub fn current(&self) -> f64 {
+        self.base_rate * self.multiplier
+    }
+
+    /// Increase rate (on failure) - system becomes more sensitive.
+    pub fn boost(&mut self) {
+        self.multiplier = (self.multiplier * self.boost_factor).min(self.max_multiplier);
+    }
+
+    /// Decrease rate (on success) - system calms down.
+    pub fn decay_rate(&mut self) {
+        self.multiplier = (self.multiplier * self.decay).max(1.0);
+    }
+}
+
+// ============================================================================
+// FAILURE CLASSIFICATION (original Arbiter)
+// ============================================================================
+
+/// Failure classification (legacy, kept for compatibility).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum FailureClass {
     /// Network-related failures
@@ -59,6 +199,19 @@ impl FailureClass {
             Self::PolicyViolation
         } else {
             Self::Unknown
+        }
+    }
+    
+    /// Convert to FailureCategory for strategy recommendation.
+    pub fn to_category(&self) -> FailureCategory {
+        match self {
+            Self::Network => FailureCategory::Network,
+            Self::Timeout => FailureCategory::Timeout,
+            Self::ResourceExhaustion => FailureCategory::ResourceExhaustion,
+            Self::ServiceUnavailable => FailureCategory::ExternalApi,
+            Self::ValidationError => FailureCategory::Other("validation".into()),
+            Self::PolicyViolation => FailureCategory::PolicyViolation,
+            Self::Unknown => FailureCategory::Other("unknown".into()),
         }
     }
 }
