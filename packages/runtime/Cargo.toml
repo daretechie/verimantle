@@ -1,0 +1,21 @@
+[package]
+name = "verimantle-runtime"
+version = "0.1.0"
+edition = "2021"
+description = "VeriMantle Universal Runtime - runs anywhere"
+license = "Apache-2.0"
+repository = "https://github.com/verimantle/verimantle"
+keywords = ["ai", "agents", "runtime", "universal"]
+categories = ["asynchronous", "web-programming"]
+
+[dependencies]
+tokio = { version = "1", features = ["full", "signal"] }
+tracing = "0.1"
+thiserror = "1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[[bin]]
+name = "verimantle"
+path = "src/bin/main.rs"
