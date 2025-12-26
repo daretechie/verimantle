@@ -45,6 +45,9 @@ pub enum NexusError {
     #[error("Rate limited")]
     RateLimited,
 
+    #[error("Feature not supported: {feature}")]
+    NotSupported { feature: String },
+
     #[error("Timeout")]
     Timeout,
 }

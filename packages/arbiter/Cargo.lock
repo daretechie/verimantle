@@ -1653,6 +1653,7 @@ dependencies = [
  "libc",
  "openraft",
  "parking_lot",
+ "rand",
  "serde",
  "serde_json",
  "thiserror",

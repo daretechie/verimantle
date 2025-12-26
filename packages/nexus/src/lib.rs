@@ -51,6 +51,7 @@ pub mod router;
 pub mod discovery;
 pub mod registry;
 pub mod error;
+pub mod marketplace;
 
 // Re-exports
 pub use types::*;
@@ -60,6 +61,7 @@ pub use router::TaskRouter;
 pub use discovery::AgentDiscovery;
 pub use registry::AgentRegistry;
 pub use error::NexusError;
+pub use marketplace::{Marketplace, TaskAuction, Bid, Settlement};
 
 use std::sync::Arc;
 use tokio::sync::RwLock;

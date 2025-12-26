@@ -13,9 +13,11 @@ mod adapter;
 mod a2a;
 mod mcp;
 mod verimantle;
+mod translator;
 
 pub use adapter::{ProtocolAdapter, AdapterRegistry};
 pub use crate::types::Protocol;
+pub use translator::{ProtocolTranslator, TranslationResult, FieldMapping};
 
 // Re-export specific adapters when features enabled
 #[cfg(feature = "a2a")]
@@ -25,3 +27,4 @@ pub use a2a::A2AAdapter;
 pub use mcp::MCPAdapter;
 
 pub use verimantle::VeriMantleAdapter;
+
