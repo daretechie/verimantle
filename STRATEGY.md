@@ -11,12 +11,13 @@ Instead of building disparate tools, VeriMantle is the **"Unified Agentic Operat
 ---
 
 ## 2. The 2026 "Unicorn" Problem
-Once every agent has an "Identity" (VeriMantle-Identity), the next crisis will be **Coordination, Conflict, and Logic**.
+Once every agent has an "Identity" (VeriMantle-Identity), the next crisis will be **Coordination, Conflict, Logic, and Payments**.
 
-We are solving three "Blue Ocean" problems simultaneously:
+We are solving four "Blue Ocean" problems simultaneously:
 1.  **The Agentic Arbitrator (Traffic Control)**: 1,000 agents colliding over the same API resources.
 2.  **The Universal Context Engine (Memory)**: Agents forgetting "Original Intent" in long execution chains (Context Rot).
 3.  **The Logic-Bridge (Safety)**: Enterprises needing "Deterministic Proof of Business Logic" before an agent spends money.
+4.  **The Payment Rails (Treasury)**: Agents paying each other for services without human intervention.
 
 ---
 
@@ -59,6 +60,7 @@ We are keeping `AgentProof` (now `@verimantle/identity`) as the foundation and b
 | **Safety** | **VeriMantle Gate** | Logic & Permissions | Kernel Permissions | **Rust** (Neuro-Symbolic) |
 | **Memory** | **VeriMantle Synapse** | State & Intent | Shared RAM | **Rust** (Graph Ledger) |
 | **Coordination** | **VeriMantle Arbiter** | Conflict Resolution | Traffic Control | **Rust** (Atomic Locking) |
+| **Payments** | **VeriMantle Treasury** | Agent Payments | The Bank | **Rust** (2-Phase Commit) |
 
 ---
 

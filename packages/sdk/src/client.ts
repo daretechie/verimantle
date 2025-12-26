@@ -27,7 +27,7 @@
  */
 
 import type { VeriMantleConfig, DataResidencyRegion } from './types';
-import type { IdentityPort, GatePort, SynapsePort, ArbiterPort, SovereignPort } from './ports';
+import type { IdentityPort, GatePort, SynapsePort, ArbiterPort, SovereignPort, TreasuryPort } from './ports';
 
 // ============================================================================
 // DEFAULT CONFIGURATION
@@ -47,11 +47,12 @@ const DEFAULT_CONFIG: Required<VeriMantleConfig> = {
 /**
  * VeriMantle - The Unified Agentic Operating System Client.
  * 
- * Provides access to the Four Pillars:
+ * Provides access to the Five Pillars:
  * - **Identity**: Agent authentication & liability
  * - **Gate**: Pre-execution verification & guardrails
  * - **Synapse**: Cross-agent state & memory
  * - **Arbiter**: Conflict resolution & coordination
+ * - **Treasury**: Agent-to-agent payments
  * 
  * Plus:
  * - **Sovereign**: Data residency & compliance
@@ -78,6 +79,9 @@ export class VeriMantle {
   /** Sovereign module (Data Residency) */
   public readonly sovereign: SovereignPort;
 
+  /** Treasury module (Payments) */
+  public readonly treasury: TreasuryPort;
+
   /**
    * Create a new VeriMantle client instance.
    * 
@@ -98,6 +102,7 @@ export class VeriMantle {
     this.synapse = this.createSynapseAdapter();
     this.arbiter = this.createArbiterAdapter();
     this.sovereign = this.createSovereignAdapter();
+    this.treasury = this.createTreasuryAdapter();
   }
 
   // ==========================================================================
@@ -296,6 +301,44 @@ export class VeriMantle {
       async validateCompliance(operation, data, jurisdiction) {
         // TODO: Connect to VeriMantle-Sovereign API
         return { compliant: true };
+      },
+    };
+  }
+
+  /**
+   * Create the Treasury adapter.
+   * In production, this connects to VeriMantle-Treasury service.
+   */
+  private createTreasuryAdapter(): TreasuryPort {
+    return {
+      async getBalance(agentId) {
+        // TODO: Connect to VeriMantle-Treasury API
+        return {
+          balance: 0,
+          currency: 'VMC',
+          pending: 0,
+        };
+      },
+      async transfer(from, to, amount, reference) {
+        // TODO: Connect to VeriMantle-Treasury API
+        return {
+          transactionId: crypto.randomUUID(),
+          status: 'completed',
+        };
+      },
+      async setSpendingLimit(agentId, limit, period) {
+        // TODO: Connect to VeriMantle-Treasury API
+      },
+      async getRemainingBudget(agentId) {
+        // TODO: Connect to VeriMantle-Treasury API
+        return {
+          remaining: Infinity,
+          period: 'unlimited',
+        };
+      },
+      async canSpend(agentId, amount) {
+        // TODO: Connect to VeriMantle-Treasury API
+        return true;
       },
     };
   }

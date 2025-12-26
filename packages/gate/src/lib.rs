@@ -40,6 +40,9 @@ pub mod hipaa;             // HIPAA Healthcare Compliance (Section 2)
 pub mod pci;               // PCI-DSS Payment Compliance (Section 2)
 pub mod fhir;              // FHIR R4 Healthcare Integration (Section 2)
 
+// MANDATE.md Section 6: Prompt Defense
+pub mod prompt_guard;      // Prompt injection detection
+
 #[cfg(feature = "wasm")]
 pub mod wasm;              // WASM Component Model
 

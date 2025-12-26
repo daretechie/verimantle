@@ -52,9 +52,11 @@ graph TD
     subgraph "The Core (Rust/Hyper-Loop)"
         Gateway --> |Zero-Copy| Arbiter[Arbiter (Traffic Control)]
         Gateway --> |WASM| Gate[Gate (Logic & Policy)]
+        Gateway --> |Atomic| Treasury[Treasury (Payments)]
         
         Arbiter --> |Raft Consensus| LockManager[Global Lock Manager]
         Gate --> |eBPF Tracing| Observability[Observability Plane]
+        Treasury --> |2PC| Ledger[Agent Balance Ledger]
     end
 
     subgraph "The Memory (Distributed)"

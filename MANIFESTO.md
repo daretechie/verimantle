@@ -44,19 +44,22 @@ We believe it's time for an **Agentic Operating System**.
 
 **VeriMantle** is the foundational layer for autonomous AI agents.
 
-We provide four universal primitives — the **Four Pillars** — that every agent needs:
+We provide five universal primitives — the **Five Pillars** — that every agent needs:
 
 ### 🪪 Identity
-Every agent action is cryptographically signed. When something goes wrong, you know *exactly* which agent did what and when. Liability is traceable.
+Every agent action is cryptographically signed. When something goes wrong, you know *exactly* which agent did what and when. Liability is traceable. Agents have **verifiable reputations** built on their transaction history.
 
 ### 🛡️ Gate  
 Before any action executes, it passes through our **Neuro-Symbolic Verification Engine**. Deterministic policy checks in under 1ms. Semantic malice detection (prompt injection, social engineering) in under 20ms.
 
 ### 🧠 Synapse
-Agents have goals, not just actions. Synapse tracks **Intent Paths** — the progression from goal to completion. When an agent starts taking more steps than expected, we detect **drift** before it becomes a problem.
+Agents have goals, not just actions. Synapse tracks **Intent Paths** — the progression from goal to completion. When an agent starts taking more steps than expected, we detect **drift** before it becomes a problem. Automatic alerting via webhooks.
 
 ### ⚖️ Arbiter
 When multiple agents need the same resource, Arbiter provides **Atomic Business Locks** with priority-based scheduling. No race conditions. No double-spending. No chaos.
+
+### 💰 Treasury *(New)*
+Agents can **pay each other** for services. Treasury provides atomic transfers with 2-phase commit, spending budgets, and micropayment aggregation. The missing infrastructure for the **Agentic Economy**.
 
 ---
 
@@ -86,6 +89,7 @@ VeriMantle is **open source at the foundation**:
 - `verimantle-gate` — Policy verification
 - `verimantle-synapse` — State management
 - `verimantle-arbiter` — Coordination
+- `verimantle-treasury` — Agent payments
 
 **Commercial (VeriMantle Cloud)**:
 - Multi-node orchestration
@@ -114,10 +118,10 @@ const client = new VeriMantle({ region: 'eu' });
 
 We're not just building infrastructure. We're enabling a new economy.
 
-Imagine a world where:
-- Agents have **verifiable reputations** built on their transaction history
-- Agents can **pay each other** for services via micropayment rails
-- Agents can be **legally incorporated** as LLCs, shielding developers from liability
+With VeriMantle, agents can:
+- Have **verifiable reputations** built on their transaction history *(Identity + Trust Scoring)*
+- **Pay each other** for services via micropayment rails *(Treasury)*
+- Be **legally incorporated** as LLCs, shielding developers from liability
 - Humans maintain **oversight and control** through a Mission Control UI
 
 This is the **Agentic Economy**. And VeriMantle is its operating system.

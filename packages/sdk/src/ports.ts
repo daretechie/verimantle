@@ -175,3 +175,47 @@ export interface SovereignPort {
    */
   validateCompliance(operation: string, data: unknown, jurisdiction: string): Promise<{ compliant: boolean; violations?: string[] }>;
 }
+
+// ============================================================================
+// TREASURY PORT (VeriMantle-Treasury) - Agent Payments
+// ============================================================================
+
+/**
+ * Port for Treasury operations - The "Bank" interface.
+ * Per MANIFESTO.md: Agents can pay each other for services.
+ */
+export interface TreasuryPort {
+  /**
+   * Get balance for an agent.
+   */
+  getBalance(agentId: string): Promise<{ balance: number; currency: string; pending: number }>;
+
+  /**
+   * Transfer funds between agents.
+   */
+  transfer(
+    from: string,
+    to: string,
+    amount: number,
+    reference?: string
+  ): Promise<{ transactionId: string; status: 'completed' | 'pending' | 'failed' }>;
+
+  /**
+   * Set spending limit for an agent.
+   */
+  setSpendingLimit(
+    agentId: string,
+    limit: number,
+    period: 'transaction' | 'hourly' | 'daily' | 'weekly' | 'monthly'
+  ): Promise<void>;
+
+  /**
+   * Get remaining budget for an agent.
+   */
+  getRemainingBudget(agentId: string): Promise<{ remaining: number; period: string }>;
+
+  /**
+   * Check if agent can spend amount (pre-flight check).
+   */
+  canSpend(agentId: string, amount: number): Promise<boolean>;
+}

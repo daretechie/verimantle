@@ -1,0 +1,58 @@
+[package]
+name = "verimantle-treasury"
+version = "0.1.0"
+edition = "2021"
+description = "VeriMantle-Treasury: Agent Payment Infrastructure"
+license = "MIT"
+
+[lib]
+name = "verimantle_treasury"
+path = "src/lib.rs"
+
+[[bin]]
+name = "treasury-server"
+path = "src/bin/server.rs"
+
+[features]
+default = []
+# Cryptocurrency support
+crypto_payments = []
+# Traditional payment rails
+fiat = []
+# Micropayment aggregation
+micropayments = []
+full = ["crypto_payments", "fiat", "micropayments"]
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.48", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# HTTP server
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+# Tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+thiserror = "1"
+anyhow = "1"
+
+# UUID and time
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Concurrent data structures
+parking_lot = "0.12"
+
+# Decimal for financial calculations
+rust_decimal = { version = "1", features = ["serde"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
