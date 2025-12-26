@@ -1,7 +1,11 @@
-//! Identity Provider Integration
+//! External Identity Provider Federation
 //!
-//! Bridge between VeriMantle DIDs and enterprise identity providers
-//! Supports: Entra, Okta, Auth0, Ping Identity, etc.
+//! NOTE: This is for EXTERNAL identity providers (Entra, Okta, Auth0)
+//! VeriMantle's core identity is in:
+//!   - apps/identity/ (NestJS service)
+//!   - apps/gateway/src/services/identity.service.ts
+//!
+//! This module federates external IDP agent IDs with VeriMantle DIDs
 //! Trust score provider for Zero Trust Conditional Access
 //!
 //! Graceful Degradation: Works with credentials, demo mode without
