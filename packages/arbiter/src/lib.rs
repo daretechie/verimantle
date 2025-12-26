@@ -55,6 +55,7 @@ pub mod carbon;            // Carbon-Aware Computing (Section 7)
 // Roadmap modules
 pub mod antifragile;       // Anti-Fragile Self-Healing Engine
 pub mod chaos;             // Chaos Testing / Fault Injection
+pub mod loop_prevention;   // Runaway Loop Prevention ($47k incident)
 
 
 // Re-exports
@@ -69,5 +70,6 @@ pub use killswitch::{KillSwitch, KillReason, KillRecord, TerminationType};
 pub use carbon::{CarbonScheduler, CarbonIntensity, CarbonRegion};
 pub use antifragile::{AntifragileEngine, Failure, FailureClass, RecoveryStrategy, CircuitBreaker, CircuitState};
 pub use chaos::{ChaosMonkey, ChaosConfig, ChaosError, ChaosResult, ChaosStats};
+pub use loop_prevention::{LoopPreventer, LoopPreventionConfig, TrackedMessage, LoopPreventionError};
 
 

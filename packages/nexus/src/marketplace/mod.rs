@@ -519,4 +519,83 @@ mod tests {
 
         assert_eq!(amount, 50.0);
     }
+
+    #[test]
+    fn test_bid_exceeds_budget() {
+        let mut auction = TaskAuction::new(
+            "task-1",
+            "Limited budget",
+            100.0,
+            1,
+            1,
+            "client-1"
+        );
+
+        let expensive_bid = Bid::new("task-1", "agent-1", 150.0, 3600);
+        let result = auction.submit_bid(expensive_bid);
+
+        assert!(matches!(result, Err(MarketplaceError::BidExceedsBudget)));
+    }
+
+    #[test]
+    fn test_duplicate_bid() {
+        let mut auction = TaskAuction::new(
+            "task-1",
+            "Test task",
+            200.0,
+            1,
+            1,
+            "client-1"
+        );
+
+        let bid1 = Bid::new("task-1", "agent-1", 100.0, 3600);
+        let bid2 = Bid::new("task-1", "agent-1", 90.0, 3600);
+
+        auction.submit_bid(bid1).unwrap();
+        let result = auction.submit_bid(bid2);
+
+        assert!(matches!(result, Err(MarketplaceError::DuplicateBid)));
+    }
+
+    #[test]
+    fn test_auction_cancelled_no_bids() {
+        let mut auction = TaskAuction::new(
+            "task-1",
+            "Unpopular task",
+            500.0,
+            1,
+            1,
+            "client-1"
+        );
+
+        // Evaluate with no bids
+        let winner = auction.evaluate();
+
+        assert!(winner.is_none());
+        assert_eq!(auction.status, AuctionStatus::Cancelled);
+    }
+
+    #[test]
+    fn test_settlement_refund() {
+        let mut market = Marketplace::new();
+
+        let mut auction = TaskAuction::new(
+            "task-1",
+            "Refundable",
+            100.0,
+            1,
+            1,
+            "client-1"
+        );
+
+        let bid = Bid::new("task-1", "worker-1", 75.0, 1800);
+        auction.submit_bid(bid).unwrap();
+        auction.evaluate();
+
+        let settlement_id = market.create_settlement(&auction).unwrap();
+        let refund = market.refund_settlement(&settlement_id).unwrap();
+
+        assert_eq!(refund, 75.0);
+    }
 }
+

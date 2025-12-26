@@ -297,4 +297,73 @@ mod tests {
         assert!(json.contains("a2a"));
         assert!(json.contains("mcp"));
     }
+
+    #[test]
+    fn test_empty_skills_score() {
+        let card = AgentCard::new("agent", "Agent", "http://localhost");
+        
+        // No skills required = 100% match
+        assert_eq!(card.skill_match_score(&[]), 100);
+        
+        // Skills required but agent has none = 0%
+        let required = vec!["nlp".into()];
+        assert_eq!(card.skill_match_score(&required), 0);
+    }
+
+    #[test]
+    fn test_capability_builder() {
+        let card = AgentCard::new("agent", "Agent", "http://localhost")
+            .with_capability(Capability {
+                name: "streaming".into(),
+                input_modes: vec![Modality::Text],
+                output_modes: vec![Modality::Text, Modality::Audio],
+                rate_limit: Some(60),
+            });
+        
+        assert_eq!(card.capabilities.len(), 1);
+        assert_eq!(card.capabilities[0].name, "streaming");
+    }
+
+    #[test]
+    fn test_auth_schemes() {
+        let mut card = AgentCard::new("secure-agent", "Secure", "https://secure.example.com");
+        card.authentication = AuthInfo {
+            schemes: vec![AuthScheme::OAuth2, AuthScheme::ApiKey],
+            oauth: Some(OAuthConfig {
+                authorization_url: "https://auth.example.com/authorize".into(),
+                token_url: "https://auth.example.com/token".into(),
+                scopes: vec!["read".into(), "write".into()],
+            }),
+        };
+        
+        let json = card.to_json().unwrap();
+        assert!(json.contains("oauth2"));
+        assert!(json.contains("authorization_url"));
+    }
+
+    #[test]
+    fn test_provider_info() {
+        let mut card = AgentCard::new("corp-agent", "Corp Agent", "https://corp.example.com");
+        card.provider = Some(Provider {
+            organization: "VeriMantle Inc.".into(),
+            url: Some("https://verimantle.io".into()),
+        });
+        
+        let json = card.to_json().unwrap();
+        assert!(json.contains("VeriMantle Inc."));
+    }
+
+    #[test]
+    fn test_extensions() {
+        let mut card = AgentCard::new("extended", "Extended Agent", "http://localhost");
+        card.extensions.insert("custom_field".into(), serde_json::json!({"key": "value"}));
+        card.extensions.insert("version_info".into(), serde_json::json!("v2.0"));
+        
+        let json = card.to_json().unwrap();
+        let parsed = AgentCard::from_json(&json).unwrap();
+        
+        assert!(parsed.extensions.contains_key("custom_field"));
+        assert!(parsed.extensions.contains_key("version_info"));
+    }
 }
+

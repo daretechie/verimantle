@@ -180,3 +180,87 @@ export class NexusController {
     };
   }
 }
+
+/**
+ * Well-Known Controller for A2A Agent Discovery
+ * 
+ * Per A2A Spec: Agents publish capabilities at /.well-known/agent.json
+ */
+@Controller('.well-known')
+export class WellKnownController {
+  constructor(private readonly nexusService: NexusService) {}
+
+  /**
+   * A2A Agent Card endpoint.
+   * Returns this gateway's agent card for discovery.
+   */
+  @Get('agent.json')
+  async getAgentCard() {
+    return {
+      id: 'verimantle-gateway',
+      name: 'VeriMantle Gateway',
+      description: 'Universal Agent Protocol Gateway - The Agentic Operating System',
+      url: process.env.GATEWAY_URL || 'http://localhost:3000',
+      version: '1.0.0',
+      provider: {
+        organization: 'VeriMantle',
+        url: 'https://verimantle.io',
+      },
+      capabilities: [
+        {
+          name: 'protocol-translation',
+          inputModes: ['text', 'code'],
+          outputModes: ['text', 'code'],
+        },
+        {
+          name: 'agent-discovery',
+          inputModes: ['text'],
+          outputModes: ['text'],
+        },
+        {
+          name: 'task-routing',
+          inputModes: ['text'],
+          outputModes: ['text'],
+        },
+      ],
+      skills: [
+        {
+          id: 'translate',
+          name: 'Protocol Translation',
+          description: 'Translate messages between A2A, MCP, and VeriMantle protocols',
+          tags: ['translation', 'a2a', 'mcp'],
+        },
+        {
+          id: 'route',
+          name: 'Task Routing',
+          description: 'Route tasks to the best matching agent',
+          tags: ['routing', 'orchestration'],
+        },
+        {
+          id: 'discover',
+          name: 'Agent Discovery',
+          description: 'Discover and register agents from URLs',
+          tags: ['discovery', 'registry'],
+        },
+      ],
+      defaultInputModes: ['text'],
+      defaultOutputModes: ['text'],
+      authentication: {
+        schemes: ['bearer', 'apiKey'],
+      },
+      protocols: [
+        { name: 'a2a', version: '0.3' },
+        { name: 'mcp', version: '2025-06-18' },
+        { name: 'verimantle', version: '1.0' },
+      ],
+      extensions: {
+        verimantle: {
+          pillars: ['identity', 'gate', 'synapse', 'arbiter', 'nexus', 'treasury'],
+          loopPrevention: true,
+          explainability: true,
+        },
+      },
+    };
+  }
+}
+

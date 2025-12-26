@@ -6,12 +6,13 @@
  */
 
 import { Module } from '@nestjs/common';
-import { NexusController } from '../controllers/nexus.controller';
+import { NexusController, WellKnownController } from '../controllers/nexus.controller';
 import { NexusService } from '../services/nexus.service';
 
 @Module({
-  controllers: [NexusController],
+  controllers: [NexusController, WellKnownController],
   providers: [NexusService],
   exports: [NexusService],
 })
 export class NexusModule {}
+
