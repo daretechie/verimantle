@@ -43,6 +43,8 @@ pub mod adaptive;    // Adaptive Query Execution (ENGINEERING_STANDARD Section 2
 
 // GLOBAL_GAPS.md modules
 pub mod embeddings;  // Polyglot Embeddings (Section 2)
+pub mod mesh;        // Global Mesh Sync (Section 1)
+pub mod polyglot;    // Native Language Support
 
 // COMPETITIVE_LANDSCAPE.md modules
 pub mod crdt;        // Conflict-Free Replicated Data Types
@@ -56,6 +58,8 @@ pub use graph::{GraphVectorDB, GraphNode, GraphEdge, NodeType, EdgeType};
 pub use adaptive::{AdaptiveExecutor, ExecutionStrategy, ExecutionMetrics};
 pub use embeddings::{EmbeddingConfig, EmbeddingProvider, PolyglotEmbedder, SynapseRegion};
 pub use crdt::{GCounter, PNCounter, LwwRegister, OrSet, LwwMap, AgentStateCrdt};
+pub use mesh::{GlobalMesh, MeshCell, DataRegion, MeshSync, GeoFence};
+pub use polyglot::{Language, PolyglotMemory};
 
 // NOTE: Antifragile moved to verimantle-arbiter during consolidation
 // See: packages/arbiter/src/antifragile.rs

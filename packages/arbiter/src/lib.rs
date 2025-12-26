@@ -47,6 +47,7 @@ pub mod thread_per_core;   // Thread-per-Core for minimal latency
 
 // ISO 42001 Compliance (per GLOBAL_GAPS.md §3)
 pub mod audit;             // Audit Ledger for compliance traceability
+pub mod iso42001;          // ISO 42001 AIMS automated reporting
 
 // EXECUTION_MANDATE.md modules
 pub mod killswitch;        // Kill Switch for agent termination (Section 6)
@@ -93,4 +94,8 @@ pub use eu_ai_act::{
 };
 pub use cost::{
     CostTracker, CostEvent, CostCategory, CostAlert, AlertLevel, GlobalCostSummary,
+};
+pub use iso42001::{
+    ComplianceLedger, AuditEvent, HumanOversight, AuditOutcome as Iso42001Outcome,
+    AuditReport, ReportFormat, ReportGenerator,
 };

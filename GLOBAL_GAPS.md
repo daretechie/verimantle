@@ -82,9 +82,9 @@ pub enum DataRegion {
 
 | Feature | Status | Target |
 |---------|--------|--------|
-| Geo-Fenced Cell Sync | 🔄 Planned | Q2 2026 |
-| Polyglot Embeddings | 🔄 Planned | Q2 2026 |
-| ISO 42001 Audit Ledger | 🔄 Planned | Q3 2026 |
+| Geo-Fenced Cell Sync | ✅ Implemented | Dec 2025 |
+| Polyglot Embeddings | ✅ Implemented | Dec 2025 |
+| ISO 42001 Audit Ledger | ✅ Implemented | Dec 2025 |
 
 ---
 
