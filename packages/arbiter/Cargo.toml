@@ -35,7 +35,7 @@ openraft = { version = "0.9", optional = true }
 async-trait = { version = "0.1", optional = true }
 
 # HTTP server
-axum = "0.7"
+axum = "0.8"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 
