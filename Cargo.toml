@@ -12,26 +12,17 @@ members = [
     "packages/edge",
     
     # Enterprise Edition (Commercial)
-    "ee/core",
-    "ee/cloud",
-    "ee/billing",
-    "ee/sso",
-    "ee/connectors",
-    "ee/escalation",
-    "ee/energy",
-    "ee/microvm",
-    "ee/cockpit",
     "ee/audit-export",
-    "ee/sovereign-memory",
-    "ee/sovereign-mesh",
+    "ee/billing",
+    "ee/cloud",
+    "ee/cockpit",
     "ee/multitenancy",
-    "ee/idp",
-    "ee/retail",
-    "ee/productivity",
-    "ee/trust",
+    "ee/sovereign-mesh",
+    "ee/sso",
     "ee/treasury",
-    "ee/models",
+    "ee/trust",
 ]
+
 
 [workspace.package]
 version = "0.1.0"
@@ -78,12 +69,14 @@ uuid = { version = "1.6", features = ["v4", "serde"] }
 # WASM
 wasmtime = "16.0"
 
-# Neural (ONNX)
-ort = { version = "2.0", optional = true }
+# Neural (ONNX) - use as optional in package Cargo.toml
+ort = "2.0.0-rc.10"
+ndarray = "0.15"
 
-# TEE
-# tdx-guest = "0.1"  # Uncomment when using Intel TDX hardware
-# sev = "0.1"        # Uncomment when using AMD SEV hardware
+# TEE - add when using hardware
+# tdx-guest = "0.1"
+# sev = "0.1"
+
 
 [profile.release]
 lto = true
