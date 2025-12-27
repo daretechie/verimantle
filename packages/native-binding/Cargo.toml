@@ -9,9 +9,10 @@ license = "Apache-2.0"
 crate-type = ["cdylib"]
 
 [dependencies]
-# NAPI-RS for Node.js binding (Dec 2025)
-napi = { version = "2.16", features = ["async", "serde-json"] }
-napi-derive = "2.16"
+# NAPI-RS for Node.js binding (Dec 19, 2025 - napi 3.7.1)
+napi = { version = "3.7", features = ["async", "serde-json"] }
+napi-derive = "3.0"
+
 
 # VeriMantle core packages
 verimantle-gate = { path = "../gate" }
