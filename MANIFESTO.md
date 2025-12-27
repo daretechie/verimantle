@@ -42,6 +42,18 @@ We believe it's time for an **Agentic Operating System**.
 
 ---
 
+## The Physics of Trust (The Bedrock)
+
+Software alone is not enough. You cannot have "Safety" if the admin can read the Agent's memory dump. You cannot have "Identity" if the private key is in a plain text file.
+
+True sovereignty requires **Hardware Roots of Trust**.
+
+AgentKern sits on a bedrock of **Confidential Computing (TEEs)**. Whether it's Intel TDX, AMD SEV-SNP, or AWS Nitro Enclaves, we bind the Agent's existence to silicon. Even we—the infrastructure providers—cannot see your Agent's thoughts.
+
+**Six Pillars. One Bedrock.**
+
+---
+
 ## Introducing AgentKern
 
 **AgentKern** is the foundational layer for autonomous AI agents.
@@ -49,7 +61,7 @@ We believe it's time for an **Agentic Operating System**.
 We provide six universal primitives — the **Six Pillars** — that every agent needs:
 
 ### 🪪 Identity
-Every agent action is cryptographically signed. When something goes wrong, you know *exactly* which agent did what and when. Liability is traceable. Agents have **verifiable reputations** built on their transaction history via W3C Verifiable Credentials.
+Every agent action is cryptographically signed. Private keys never leave the **Hardware Enclave (HSM/TEE)**. When something goes wrong, you know *exactly* which agent did what and when. Liability is traceable. Agents have **verifiable reputations** built on their transaction history via W3C Verifiable Credentials.
 
 ### 🛡️ Gate  
 Before any action executes, it passes through our **Neuro-Symbolic Verification Engine**. Deterministic policy checks in under 1ms. Semantic malice detection (prompt injection, social engineering) in under 20ms. Multi-layer defense against the 73% of LLM apps that are vulnerable.

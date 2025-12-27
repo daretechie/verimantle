@@ -4,7 +4,7 @@
 
 ## 1. The Core Thesis
 
-By 2026, the world will have plenty of "Agents." What it will lack is **Infrastructure**. 
+By 2026, the world will have plenty of "Agents." What it will lack is **Trusted Infrastructure**. 
 
 Right now, developers are building *how agents think* (LangChain, AutoGPT). No one is building the *plumbing they run on*.
 
@@ -21,7 +21,7 @@ We are solving five "Blue Ocean" problems simultaneously:
 1. **The Agentic Arbitrator (Traffic Control)**: 1,000 agents colliding over the same API resources.
 2. **The Universal Context Engine (Memory)**: Agents forgetting "Original Intent" in long execution chains (Context Rot).
 3. **The Logic-Bridge (Safety)**: Enterprises needing "Deterministic Proof of Business Logic" before an agent spends money.
-4. **The Payment Rails (Treasury)**: Agents paying each other for services without human intervention.
+4. **The Settlement Layer (Treasury)**: Agents exchanging **Digital Assets** for services without human intervention.
 5. **The Protocol Tower of Babel (Interoperability)**: Google A2A agents can't talk to Anthropic MCP agents. Different vendors, different protocols.
 
 ---
@@ -53,6 +53,14 @@ pub enum DataRegion {
 ```
 
 *This "Polymorphism" allows one agent to operate globally without breaking local laws.*
+
+### The Sovereign Mesh Strategy
+
+For Nation-States and Regulated Enterprises, we deploy the **Sovereign Mesh**:
+
+*   **Data Residency**: All memory (Synapse) stays within national borders (AWS Outposts / Azure Stack / On-Prem).
+*   **Code Sovereignty**: Logic (Gate) runs on local hardware, verified by local TEEs.
+*   **Federated Learning**: Insights are shared globally, but *data* never leaves the sovereign boundary.
 
 ---
 
@@ -107,6 +115,22 @@ We selected **TypeScript + Rust** after evaluating all major alternatives.
 | **Rust** | ✅ **Selected** | **Perfect Fit.** It offers the speed of C++, the safety of Java, and the concurrency needed for the "Agentic Economy." |
 
 *Our motto: "Python for the Brain (The Agent), Rust for the Body (The Infrastructure)."*
+
+---
+
+## 7. The Business Model: Infrastructure for the Machine Economy
+
+We are not selling AI. We are monetizing the **Interactions** between AIs.
+
+### A. Enterprise Node Licensing
+Corporations run their own "Private Kernels" (Sovereign Mesh).
+*   **Per-Node License**: Annual fee for the certified runtime (Gate + Arbiter).
+*   **Compliance Dashboard**: Seat-based pricing for "human-in-the-loop" audit tools.
+
+### B. Network Settlement Fees (Public Mesh)
+For the public Agentic Economy:
+*   **Transaction Tax**: Small basis points (bps) on **Digital Asset** transfers in the Treasury.
+*   **Identity Verification**: Fees for issuing high-assurance Verifiable Credentials (KYA - Know Your Agent).
 
 ---
 

@@ -7,6 +7,18 @@ Instead, we build **Adaptive Systems** using proven, high-performance technologi
 
 ---
 
+## 0. The Hardware Root of Trust (The Bedrock)
+
+Before software runs, hardware must be trusted. AgentKern Enterprise Nodes require:
+
+| Component | Requirement | Why? |
+|-----------|-------------|------|
+| **CPU** | AMD EPYC (Zen 3+) or Intel Xeon (Sapphire Rapids+) | Must support **SEV-SNP** or **TDX** for encrypted memory. |
+| **TPM** | TPM 2.0 | Secure boot and remote attestation. |
+| **HSM** | FIPS 140-2 Level 3 | (Optional) High-assurance key storage for Identity pillars. |
+
+---
+
 ## Technology Stack (December 2025 Research)
 
 > [!NOTE]
@@ -117,6 +129,17 @@ We reject "LLM-as-OS" (Too slow/unpredictable).
 | **Security** | LLM-as-Kernel | **Neuro-Symbolic** (Rust + ONNX) |
 | **I/O** | Custom Runtime | **Native Tokio io_uring** |
 | **Philosophy** | "Magic Organism" | **"Adaptive Machine"** |
+
+---
+
+## Supply Chain Security: "Artifacts, Not Just Code"
+
+We don't just ship binaries; we ship **Proofs**.
+
+*   **Reproducible Builds**: All release binaries must be byte-for-byte reproducible from source.
+*   **SBOM (Software Bill of Materials)**: Every release includes a CycloneDX SBOM listing all dependencies.
+*   **Sigstore Signing**: All artifacts are signed keylessly via Sigstore, tied to our OIDC identities.
+*   **Provenance**: SLSA Level 3 compliance tracks the build environment and parameters.
 
 ---
 
