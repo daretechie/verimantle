@@ -9,12 +9,12 @@ keywords = ["ai-agents", "a2a", "mcp", "protocol-translation"]
 categories = ["network-programming", "api-bindings"]
 
 [features]
-default = ["a2a", "mcp"]
-a2a = []          # Google A2A Protocol
-mcp = []          # Anthropic MCP
-anp = []          # W3C Agent Network Protocol
-nlip = []         # ECMA NLIP
-aitp = []         # NEAR AITP
+default = ["a2a", "mcp", "nlip"]  # Stable protocols only
+a2a = []          # Google A2A Protocol (Linux Foundation)
+mcp = []          # Anthropic MCP (Linux Foundation)
+anp = []          # W3C Agent Network Protocol (Beta)
+nlip = []         # ECMA NLIP (ECMA-430, Dec 2025 - Stable)
+aitp = []         # NEAR AITP (Beta)
 grpc = ["tonic", "prost"]
 full = ["a2a", "mcp", "anp", "nlip", "aitp", "grpc"]
 
