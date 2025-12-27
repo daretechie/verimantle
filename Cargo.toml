@@ -10,6 +10,7 @@ members = [
     "packages/treasury",
     "packages/runtime",
     "packages/edge",
+    "packages/native-binding",
     
     # Enterprise Edition (Commercial)
     "ee/audit-export",
