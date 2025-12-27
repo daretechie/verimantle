@@ -15,19 +15,18 @@ path = "src/bin/server.rs"
 
 [features]
 default = []
-# Per ARCHITECTURE.md: Hyper-Stack Features
-# Using native Tokio io_uring (1.48.0+, unstable -> will stabilize)
-io_uring = ["tokio-uring"]       # Native Tokio io_uring runtime
-wasm = ["wasmtime"]              # WASM policy isolation
-neural = ["ort", "ndarray"]                 # ONNX neural inference
-actors = ["actix"]               # Actor supervision for hot-swap
-full = ["io_uring", "wasm", "neural", "actors"]
+io_uring = ["tokio-uring"]
+wasm = ["wasmtime"]
+neural = ["ort", "ndarray"]
+actors = ["actix"]
+# Post-Quantum cryptography (NIST FIPS 203/204)
+pqc = ["ml-kem", "ml-dsa"]
+# Full feature set
+full = ["io_uring", "wasm", "neural", "actors", "pqc"]
 
 [dependencies]
 # Async runtime (Dec 2025 - verified tokio 1.48.0)
 tokio = { version = "1.48", features = ["full"] }
-
-# Native Tokio io_uring
 tokio-uring = { version = "0.5", optional = true }
 
 # Serialization
@@ -50,7 +49,6 @@ axum = "0.8.8"
 tower = "0.5"
 tower-http = { version = "0.6", features = ["cors", "trace"] }
 
-
 # Tracing/observability
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
@@ -58,6 +56,22 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 # Error handling (Dec 2025)
 thiserror = "2.0"
 anyhow = "1.0.95"
+
+# ============================================================
+# CRYPTO-AGILITY: Classical + Post-Quantum (NIST FIPS 203/204)
+# ============================================================
+
+# Classical cryptography (always enabled)
+ed25519-dalek = { version = "2.2", features = ["rand_core"] }
+rand = "0.8"
+sha2 = "0.10.8"
+base64 = "0.22"
+
+# Post-Quantum cryptography (feature-gated, NIST FIPS 203/204)
+# ML-KEM (formerly CRYSTALS-Kyber) for key encapsulation
+ml-kem = { version = "0.2", optional = true }
+# ML-DSA (formerly CRYSTALS-Dilithium) for digital signatures
+ml-dsa = { version = "0.1", optional = true }
 
 # Internal dependencies
 verimantle-treasury = { path = "../treasury" }
@@ -78,4 +92,5 @@ criterion = "0.5"
 [[bench]]
 name = "policy_eval"
 harness = false
+
 
